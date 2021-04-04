@@ -22,7 +22,9 @@ public class UserController {
         this.agifyClient = agifyClient;
     }
     @GetMapping(path = "/api/matches", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<UserTwitterData> sayHello(@RequestParam(name = "userName") String name, @RequestParam(name = "userCountry") String userCountry) throws IOException {
+    List<UserTwitterData> sayHello( @RequestParam(name = "userName") String name,
+                                    @RequestParam(name = "userCountry") String userCountry)
+                                    throws IOException {
         UserData referenceUserData = userRepository.getUserFromUserName(name);
         List<UserData> matches = new ArrayList<>();
         for(NameCountry nameCountry : userRepository.cachedAges.keySet()) {
@@ -46,8 +48,7 @@ public class UserController {
     public boolean match(UserData userDataReference, UserData userData) {
         int referenceAge = userRepository.cachedAges.get(new NameCountry(userDataReference.userName, userDataReference.userCountry));
         int otherAge = userRepository.cachedAges.get(new NameCountry(userData.userName, userData.userCountry));
-        boolean b = !userData.userName.equals(userDataReference.userName) && Math.abs(referenceAge - otherAge) <= 4
+        return !userData.userName.equals(userDataReference.userName) && Math.abs(referenceAge - otherAge) <= 4
             && userDataReference.userSex.equals(userData.userSexPref) && userDataReference.userCountry.equals(userData.userCountry);
-        return b;
     }
 }

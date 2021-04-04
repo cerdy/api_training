@@ -41,4 +41,14 @@ public class UserControllerIT {
             .perform(post(url).contentType(APPLICATION_JSON).content(json))
             .andExpect(status().isOk());
     }
+    @Test void sayHello () throws Exception {
+        String url = "/api/matches?userName=pierre&userCountry=FR";
+        UserData data = repository.getUserFromUserName("pierre");
+        String json = mapper.writeValueAsString(data);
+        when(repository.getUserFromUserName(any())).thenReturn(data);
+
+        mockMvc
+            .perform(get(url))
+            .andExpect(status().isOk());
+    }
 }
