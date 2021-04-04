@@ -14,17 +14,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-
 public class UserController {
     private final UserRepository userRepository;
     private final AgifyClient agifyClient;
-    UserController(UserRepository userRepository, AgifyClient agifyClient) {
-        this.userRepository = userRepository;
+    UserController(AgifyClient agifyClient) {
+        this.userRepository = new UserRepository();
         this.agifyClient = agifyClient;
     }
     @GetMapping(path = "/api/matches", produces = MediaType.APPLICATION_JSON_VALUE)
     List<UserTwitterData> sayHello(@RequestParam(name = "userName") String name, @RequestParam(name = "userCountry") String userCountry) throws IOException {
-        //int referenceAge = userRepository.cachedAges.get(new NameCountry(name, userCountry));
         UserData referenceUserData = userRepository.getUserFromUserName(name);
         List<UserData> matches = new ArrayList<>();
         for(NameCountry nameCountry : userRepository.cachedAges.keySet()) {
@@ -38,7 +36,8 @@ public class UserController {
     public void addMember(@RequestBody UserData userData) throws IOException {
         if(!userRepository.cachedAges.containsKey(new NameCountry(userData.userName, userData.userCountry))){
             Response<AgifyData> response = agifyClient.agify(userData.userName, userData.userCountry).execute();
-            if(response.isSuccessful()) { AgifyData agifyData = response.body();
+            if(response.isSuccessful()) {
+                AgifyData agifyData = response.body();
                 userRepository.cachedAges.put(new NameCountry(userData.userName, userData.userCountry), agifyData.age);
                 userRepository.addUser(userData);
             } else System.out.println(response.errorBody());
